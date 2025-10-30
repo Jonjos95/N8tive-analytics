@@ -1,0 +1,14 @@
+{
+  "name": "n8tive-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm -w apps/analytics-web run build",
+    "dev": "npm -w apps/analytics-web run dev",
+    "lint": "echo 'Add linters per package'"
+  }
+}

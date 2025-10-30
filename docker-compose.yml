@@ -1,0 +1,50 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: n8tive
+      POSTGRES_PASSWORD: n8tive
+      POSTGRES_DB: n8tive
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  auth:
+    build: ./apps/auth
+    environment:
+      AUTH_JWT_SECRET: supersecret-dev
+      AUTH_JWT_ISSUER: n8tive-auth
+      AUTH_JWT_AUDIENCE: n8tive-suite
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+
+  analytics-backend:
+    build: ./apps/analytics-backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://n8tive:n8tive@postgres:5432/n8tive
+      AUTH_JWT_SECRET: supersecret-dev
+      AUTH_JWT_ISSUER: n8tive-auth
+      AUTH_JWT_AUDIENCE: n8tive-suite
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - auth
+
+  analytics-web:
+    build: ./apps/analytics-web
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_AUTH_URL: http://localhost:8001
+    ports:
+      - "5173:5173"
+    depends_on:
+      - analytics-backend
+      - auth
+
+volumes:
+  pgdata:
