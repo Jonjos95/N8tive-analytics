@@ -9,3 +9,8 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </AuthProvider>
 )
+
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  document.body.style.setProperty('--bg-shift', String(Math.min(60, y*0.05))+'px');
+});
