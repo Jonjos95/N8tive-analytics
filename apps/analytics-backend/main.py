@@ -9,15 +9,22 @@ from typing import List, Optional, Dict, Any
 
 app = FastAPI(title="N8tive Analytics Backend")
 
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173")
+allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
-JWT_SECRET = os.getenv("AUTH_JWT_SECRET", "supersecret-dev")
+JWT_SECRET = os.getenv("AUTH_JWT_SECRET", "")
+if not JWT_SECRET:
+    import sys
+    print("ERROR: AUTH_JWT_SECRET environment variable must be set", file=sys.stderr)
+    sys.exit(1)
 JWT_ISSUER = os.getenv("AUTH_JWT_ISSUER", "n8tive-auth")
 JWT_AUDIENCE = os.getenv("AUTH_JWT_AUDIENCE", "n8tive-suite")
 
